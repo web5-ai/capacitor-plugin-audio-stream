@@ -1,5 +1,5 @@
 {
-  "name": "capacitor-plugin-audio-stream",
+  "name": "@web5-team/capacitor-plugin-audio-stream",
   "version": "0.0.0",
   "description": "audio stream",
   "main": "dist/plugin.cjs.js",
