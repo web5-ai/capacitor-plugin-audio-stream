@@ -59,7 +59,7 @@ stop() => any
 ## Usage
 
 ```typescript
-import { AudioStream } from 'capacitor-plugin-audio-stream'
+import { AudioStream } from '@web5-team/capacitor-plugin-audio-stream'
 
 window.addEventListener('audioData', (data) => {
   console.log(data) // { success: true, data: 'base64...' }
