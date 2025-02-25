@@ -1,11 +1,11 @@
-# capacitor-plugin-audio-stream
+# @web5-team/capacitor-plugin-audio-stream
 
 audio stream
 
 ## Install
 
 ```bash
-npm install capacitor-plugin-audio-stream
+npm install @web5-team/capacitor-plugin-audio-stream
 npx cap sync
 ```
 
