@@ -1,6 +1,6 @@
 # @web5-team/capacitor-plugin-audio-stream
 
-audio stream
+Get the native audio stream and return it in Base64 format.
 
 ## Install
 
