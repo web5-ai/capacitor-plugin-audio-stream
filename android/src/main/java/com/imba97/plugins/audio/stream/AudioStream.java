@@ -10,7 +10,8 @@ public class AudioStream {
     private static final String TAG = "AudioStream";
     
     // 音频参数配置
-    private static final int SAMPLE_RATE = 44100;
+    private static final int SAMPLE_RATE = 16000;
+    private final static int WAVE_FRAM_SIZE = 20 * 2 * SAMPLE_RATE / 1000;
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     
@@ -28,25 +29,13 @@ public class AudioStream {
     }
 
     public void startRecording() {
-        // 计算缓冲区大小
-        bufferSize = AudioRecord.getMinBufferSize(
-            SAMPLE_RATE,
-            CHANNEL_CONFIG,
-            AUDIO_FORMAT
-        );
-
-        // 处理无效缓冲区大小
-        if (bufferSize == AudioRecord.ERROR || bufferSize == AudioRecord.ERROR_BAD_VALUE) {
-            bufferSize = SAMPLE_RATE * 2;
-        }
-
         // 初始化 AudioRecord
         audioRecord = new AudioRecord(
-            MediaRecorder.AudioSource.MIC,
+            MediaRecorder.AudioSource.DEFAULT,
             SAMPLE_RATE,
             CHANNEL_CONFIG,
             AUDIO_FORMAT,
-            bufferSize
+            WAVE_FRAM_SIZE * 4
         );
 
         // 检查初始化状态
@@ -60,11 +49,11 @@ public class AudioStream {
 
         // 创建录音线程
         recordingThread = new Thread(() -> {
-            byte[] buffer = new byte[bufferSize];
-            
+            byte[] buffer = new byte[WAVE_FRAM_SIZE * 4];
+
             while (isRecording && !Thread.interrupted()) {
                 int bytesRead = audioRecord.read(buffer, 0, buffer.length);
-                
+
                 if (bytesRead > 0) {
                     processAudioData(buffer, bytesRead);
                 } else {
@@ -81,7 +70,7 @@ public class AudioStream {
             try {
                 // 停止标志
                 isRecording = false;
-                
+
                 // 停止并释放资源
                 audioRecord.stop();
                 audioRecord.release();
