@@ -13,7 +13,7 @@
     "dist/",
     "ios/Sources",
     "Package.swift",
-    "CapacitorPluginAudioStream.podspec"
+    "Web5TeamCapacitorPluginAudioStream.podspec"
   ],
   "author": "imba97 <mail@imba97.cn>",
   "license": "MIT",

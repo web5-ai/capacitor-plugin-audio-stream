@@ -7,7 +7,7 @@ public class AudioStreamPlugin: CAPPlugin {
     override public func load() {
         super.load()
         audioStream = AudioStream()
-        audioStream.setBridge(bridge: self.bridge)
+        audioStream.setPlugin(plugin: self)
     }
 
     @objc func start(_ call: CAPPluginCall) {

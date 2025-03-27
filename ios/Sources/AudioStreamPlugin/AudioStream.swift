@@ -8,10 +8,10 @@ class AudioStream: NSObject {
     
     private var audioRecorder: AVAudioRecorder?
     private var isRecording = false
-    private var bridge: CAPBridge?
+    private var plugin: CAPPlugin?
 
-    func setBridge(bridge: CAPBridge) {
-        self.bridge = bridge
+    func setPlugin(plugin: CAPPlugin) {
+        self.plugin = plugin
     }
 
     func startRecording() throws {
@@ -44,7 +44,7 @@ class AudioStream: NSObject {
         isRecording = false
     }
 
-    func isRecording() -> Bool {
+    func getRecordingStatus() -> Bool {
         return isRecording
     }
 }
@@ -54,11 +54,11 @@ extension AudioStream: AVAudioRecorderDelegate {
         guard flag else { return }
         if let data = try? Data(contentsOf: recorder.url) {
             let base64Encoded = data.base64EncodedString()
-            bridge?.triggerWindowJSEvent(eventName: "audioData", data: ["data": base64Encoded])
+            plugin?.notifyListeners("audioData", data: ["data": base64Encoded])
         }
     }
 
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
-        bridge?.triggerWindowJSEvent(eventName: "audioError", data: ["error": "ENCODE_ERROR", "message": error?.localizedDescription ?? "Unknown error"])
+        plugin?.notifyListeners("audioError", data: ["error": "ENCODE_ERROR", "message": error?.localizedDescription ?? "Unknown error"])
     }
 }
