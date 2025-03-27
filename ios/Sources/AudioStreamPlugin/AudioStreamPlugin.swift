@@ -15,7 +15,7 @@ public class AudioStreamPlugin: CAPPlugin {
             try audioStream.startRecording()
             call.resolve()
         } catch {
-            call.reject("Failed to start recording", error)
+            call.reject("Failed to start recording: \(error.localizedDescription)")
         }
     }
 
