@@ -1,6 +1,6 @@
 {
   "name": "@web5-team/capacitor-plugin-audio-stream",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "packageManager": "pnpm@10.4.1",
   "description": "audio stream",
   "main": "dist/plugin.cjs.js",
