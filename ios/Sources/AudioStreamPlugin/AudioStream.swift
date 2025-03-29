@@ -4,8 +4,6 @@ import Capacitor
 class AudioStream: NSObject {
     private let sampleRate: Double = 44100
     private let channelCount: AVAudioChannelCount = 1
-    private let audioFormat: AVAudioFormat = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
-    
     private var audioRecorder: AVAudioRecorder?
     private var isRecording = false
     private var plugin: CAPPlugin?
@@ -15,6 +13,13 @@ class AudioStream: NSObject {
     }
 
     func startRecording() throws {
+        // 配置 AVAudioSession
+        let audioSession = AVAudioSession.sharedInstance()
+        try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker])
+        try audioSession.setActive(true)
+        try audioSession.setPreferredSampleRate(sampleRate)
+
+        // 更新录音设置
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatLinearPCM),
             AVSampleRateKey: sampleRate,
@@ -26,7 +31,7 @@ class AudioStream: NSObject {
         ]
         
         let url = URL(fileURLWithPath: NSTemporaryDirectory() + "audioRecording.wav")
-        try? FileManager.default.removeItem(at: url) // Remove the existing file if exists
+        try? FileManager.default.removeItem(at: url) // 删除已有文件
         
         audioRecorder = try AVAudioRecorder(url: url, settings: settings)
         audioRecorder?.delegate = self
@@ -42,6 +47,9 @@ class AudioStream: NSObject {
     func stopRecording() {
         audioRecorder?.stop()
         isRecording = false
+
+        // 停止 AVAudioSession
+        try? AVAudioSession.sharedInstance().setActive(false)
     }
 
     func getRecordingStatus() -> Bool {
@@ -50,15 +58,24 @@ class AudioStream: NSObject {
 }
 
 extension AudioStream: AVAudioRecorderDelegate {
-    func audioRecorderDidFinishRecordingToURL(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+    // 修改后的代理方法名称
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
         guard flag else { return }
         if let data = try? Data(contentsOf: recorder.url) {
             let base64Encoded = data.base64EncodedString()
-            plugin?.notifyListeners("audioData", data: ["data": base64Encoded])
+            // 确保在主线程中调用通知
+            DispatchQueue.main.async {
+                self.plugin?.notifyListeners("audioData", data: ["data": base64Encoded])
+            }
         }
     }
 
     func audioRecorderEncodeErrorDidOccur(_ recorder: AVAudioRecorder, error: Error?) {
-        plugin?.notifyListeners("audioError", data: ["error": "ENCODE_ERROR", "message": error?.localizedDescription ?? "Unknown error"])
+        DispatchQueue.main.async {
+            self.plugin?.notifyListeners("audioError", data: [
+                "error": "ENCODE_ERROR", 
+                "message": error?.localizedDescription ?? "Unknown error"
+            ])
+        }
     }
 }

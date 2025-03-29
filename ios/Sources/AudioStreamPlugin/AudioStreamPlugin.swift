@@ -1,7 +1,16 @@
+import Foundation
 import Capacitor
+import AVFoundation
 
 @objc(AudioStreamPlugin)
-public class AudioStreamPlugin: CAPPlugin {
+public class AudioStreamPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "AudioStreamPlugin"
+    public let jsName = "AudioStream"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise)
+    ]
+
     private var audioStream: AudioStream!
 
     override public func load() {
